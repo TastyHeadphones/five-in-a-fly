@@ -14,7 +14,7 @@ No build step.
 npx serve .
 ```
 
-Then open the printed URL. `node trainer/verify.js` prints the M1 gate. `node trainer/selftest.js` plays 200 games.
+Then open the printed URL. The board and fly are 3D (three.js). Tap the speaker for wing-buzz and stone clicks. `node trainer/verify.js` prints the M1 gate. `node trainer/selftest.js` plays 200 games.
 
 ## Gate status
 

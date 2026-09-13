@@ -2,64 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>five-in-a-fly</title>
+  <meta name="description" content="A fruit-fly mushroom body that sniffs gomoku and plays against you.">
   <link rel="icon" href="app/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="app/style.css">
 </head>
 <body>
-  <header class="mast">
-    <div>
-      <h1>five-in-a-fly</h1>
-      <p class="lede">A fruit-fly mushroom body, trained to sniff gomoku.</p>
+  <h1>five-in-a-fly</h1>
+  <p class="sub">A fruit-fly mushroom body, trained to sniff gomoku. You are black; you move first.</p>
+
+  <div class="panel flywrap">
+    <canvas id="stage"></canvas>
+    <button type="button" class="soundbtn" id="soundbtn" aria-label="Sound" aria-pressed="true">🔊</button>
+    <button type="button" class="brainbtn" id="brainbtn" aria-pressed="false">🧠 brain</button>
+    <div class="loadbar" id="loadbar">Loading the mushroom body…<div class="lbtrack"><i id="loadfill"></i></div></div>
+  </div>
+
+  <div class="row">
+    <button type="button" id="new-game">New game</button>
+    <span id="status">Loading…</span>
+  </div>
+  <p class="note">Tap a point on the board. The fly sniffs every empty square and walks to the one that smells best. Immediate fives and open fours are taken as game rules; the rest is the mushroom body. Candidates are empty squares within two cells of a stone. Hover (long-press on a phone) for the four class drives.</p>
+  <div id="hover-bars" class="hover-bars"></div>
+
+  <div id="brainwin" class="bwin" hidden>
+    <div class="bwhead" id="bwhead">
+      <span class="bwtitle">🧠 brain activity</span>
+      <span id="bwmode" class="bwmode">idle</span>
+      <button type="button" id="bwclose" class="bwclose" aria-label="Close">×</button>
     </div>
-    <p class="status" id="status">Loading…</p>
-  </header>
+    <div class="bwbody">
+      <canvas id="kcmini" width="280" height="110"></canvas>
+      <p class="sparse" data-sparse>Kenyon cells idle</p>
+      <p class="winner" data-winner></p>
+      <div data-bars></div>
+      <div class="units" data-units></div>
+      <p class="bwnote">Bar length is how much <em>less</em> drive that class receives. Lowest wins. Dots are 5,177 Kenyon cells; lit ones are firing. Title bar drags.</p>
+    </div>
+  </div>
 
-  <main class="stage">
-    <section class="play" aria-label="Board">
-      <div class="board-wrap">
-        <canvas id="board" width="560" height="560"></canvas>
-        <canvas id="fly" class="fly-layer" width="560" height="560"></canvas>
-      </div>
-      <div class="play-ui">
-        <button type="button" id="new-game">New game</button>
-        <p class="hint">You are black; you move first. The fly answers. Candidates are empty squares within two cells of a stone. Immediate five-threats are taken as game rules; the rest is the mushroom body. Hover a square (long-press on a phone) for its four class drives.</p>
-        <div id="hover-bars" class="hover-bars"></div>
-      </div>
-    </section>
+  <div class="panel">
+    <h2><span>What this is</span></h2>
+    <p class="note">The mushroom body is not a policy network. It does not choose a square. For every empty point it is shown a 9×9 window and reports a valence — WIN, BLOCK, GOOD, or NEUTRAL — the way a fly maps an odour onto approach or avoidance. We take the best-smelling square.</p>
+    <p class="note">It has no search and no working memory. It is purely reactive. It knows what a live three looks like but cannot read three moves ahead. It will beat a beginner and lose to anyone playing seriously.</p>
+    <p class="note">Only the mushroom body is simulated, not the whole fly brain. Training imitated a rule-based gomoku teacher, not human games. The dopamine-gated learning rule on Kenyon-cell to output synapses is ours; it is not in the published Shiu et al. model. On an error, synapses onto the correct class are depressed (Hige et al. 2015) and synapses onto the class the fly wrongly picked are potentiated (Handler et al. 2019).</p>
+    <p class="note">The heatmap is the point of the page. When you leave an open three, watch which squares ignite.</p>
+  </div>
 
-    <aside class="brain-wrap">
-      <button type="button" id="toggle-brain" aria-expanded="false">Brain panel</button>
-      <div id="brain-panel" class="brain-panel">
-        <p class="sparse" data-sparse>Kenyon cells idle</p>
-        <p class="winner" data-winner></p>
-        <div data-bars></div>
-        <div class="units" data-units></div>
-        <p class="micro">Bar length is how much <em>less</em> drive that class receives. Lowest wins. Twenty-four ticks per class are the individual MBONs.</p>
-      </div>
-    </aside>
-  </main>
-
-  <section class="explain">
-    <h2>What this is</h2>
-    <p>The mushroom body is not a policy network. It does not choose a square. For every empty point it is shown a 9×9 window and reports a valence — WIN, BLOCK, GOOD, or NEUTRAL — the way a fly maps an odour onto approach or avoidance. We take the best-smelling square.</p>
-    <p>It has no search and no working memory. It is purely reactive. It knows what a live three looks like but cannot read three moves ahead. It will beat a beginner and lose to anyone playing seriously.</p>
-    <p>Only the mushroom body is simulated, not the whole fly brain. Training imitated a rule-based gomoku teacher, not human games. The dopamine-gated learning rule on Kenyon-cell to output synapses is ours; it is not in the published Shiu et al. model. On an error, synapses onto the correct class are depressed (Hige et al. 2015) and synapses onto the class the fly wrongly picked are potentiated (Handler et al. 2019).</p>
-    <p>The heatmap is the point of the page. When you leave an open three, watch which squares ignite.</p>
-  </section>
-
-  <section class="explain licences">
-    <h2>Licences</h2>
-    <ul>
-      <li>This project’s code: MIT</li>
-      <li>Brain model: philshiu/Drosophila_brain_model (Shiu et al., <em>Nature</em> 2024) — MIT</li>
-      <li>Connectome: FlyWire v783 (Dorkenwald, Matsliah et al. 2024) — CC-BY 4.0</li>
-      <li>Cell-type annotations: Schlegel et al. 2024 — CC-BY 4.0</li>
-      <li>Fly body: NeuroMechFly v2 / flygym — Apache-2.0</li>
-      <li>three.js — MIT (used if present)</li>
+  <div class="panel">
+    <h2><span>Libraries and data</span></h2>
+    <ul class="libs">
+      <li>This project’s code — MIT</li>
+      <li><a href="https://github.com/philshiu/Drosophila_brain_model">Drosophila_brain_model</a><small>Shiu et al., <i>Nature</i> 2024 — MIT</small></li>
+      <li><a href="https://codex.flywire.ai/">FlyWire connectome v783</a><small>Dorkenwald, Matsliah et al. 2024 — CC-BY 4.0</small></li>
+      <li><a href="https://github.com/flyconnectome/flywire_annotations">Cell-type annotations</a><small>Schlegel et al. 2024 — CC-BY 4.0</small></li>
+      <li><a href="https://github.com/NeLy-EPFL/flygym">NeuroMechFly v2 / flygym</a><small>body proportions — Apache-2.0. Flight, grooming and stone placement are hand-animated; flygym has no flight.</small></li>
+      <li><a href="https://threejs.org/">three.js</a><small>3D display — MIT</small></li>
     </ul>
-  </section>
+  </div>
 
   <script type="module" src="app/main.js"></script>
 </body>
